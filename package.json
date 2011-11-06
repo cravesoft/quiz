@@ -1,0 +1,21 @@
+{
+  "author": "Olivier Crave <cravesoft@gmail.com> (http://www.cravesoft.com)",
+  "name": "quiz",
+  "version": "1.0",
+  "homepage": "http://www.cravesoft.com/quiz",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cravesoft/quiz.git"
+  },
+  "main": "app.js",
+  "engines": {
+    "node": ">= 0.4.12"
+  },
+  "dependencies": {
+    "express": "2.4.x",
+    "ejs": "0.4.x",
+    "socket.io": "0.7.x",
+    "connect": "1.6.x"
+  },
+  "devDependencies": {}
+}

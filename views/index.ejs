@@ -1,0 +1,95 @@
+<pre id="messages" style="max-height:300px; overflow:auto;"></pre>
+<form method="post" id="message-form">
+  <input type="text" placeholder="Type your message" id="message-input" name="message" autofocus required>
+  <input type="submit" value="OK">
+</form>
+<!--
+<form method="get" action="http://translate.google.com/translate_tts">
+    <textarea name="q"></textarea>
+    <input type="submit" value="Text-To-Speech"></input>
+</form>
+-->
+<input type="text" id="recognizer" x-webkit-speech size="1" onwebkitspeechchange="checkanswer()"" />
+<a href="#" class="redButton" id="push">Push!</a>
+ 
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+var pushed = false;
+
+Number.prototype.pad = function (len) {
+    return (new Array(len+1).join("0") + this).slice(-len);
+}
+
+/** Socket */
+var sio = io.connect(), socket = sio.socket.of('/chat');
+socket
+.on('connect', function () {
+    // at connection, first send my username
+    socket.emit('user', <%- JSON.stringify(username) %>);
+})
+.on('join', function (username, time) {
+    // someone joined room
+    addMessage(username, 'joined room', time);
+})
+.on('bye', function (username, time) {
+    // someone left room
+    addMessage(username, 'left room', time);
+})
+.on('error', function (error) {
+    // an error occured
+    alert('Error: ' + error);
+})
+.on('message', function (username, message, time) {
+    // someone wrote a message
+    addMessage(username, message, time);
+})
+.on('push', function (username, time) {
+    // someone pushed the button 
+    addMessage(username, 'pushed the button', time);
+})
+.on('release', function () {
+    // release the button 
+    pushed = false;
+})
+ 
+/** Form */
+var messageInput = $('#message-input');
+$('#message-form').submit(function() {
+  socket.emit('write', messageInput.val());
+  messageInput.val('');
+  return false;
+});
+
+$('#recognizer').click(function() {
+    if (pushed == false) {
+        socket.emit('push');
+        pushed = true;
+        return true;
+    }
+    return false;
+});
+
+//$('#push').click(function() {
+//    $('#recognizer').trigger('click');
+//    return false;
+//});
+ 
+function checkanswer() {
+    var answer = $('#recognizer').val();
+    socket.emit('write', answer);
+    $('#recognizer').val('');
+};
+
+/** Display */
+var messagesArea = $('#messages');
+function addMessage(username, message, time) {
+  if (typeof time != 'string') {
+    var date = new Date(time);
+    time = date.getHours().pad(2) + ':' + date.getMinutes().pad(2) + ':' + date.getSeconds().pad(2);
+  }
+  var line = '[' + time + '] <strong>' + username + '</strong>: ' + message + '<br />';
+  messagesArea.html(messagesArea.html() + line);
+  messagesArea.animate({scrollTop: messagesArea[0].scrollHeight});
+}
+</script>
