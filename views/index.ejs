@@ -1,4 +1,4 @@
-<pre id="messages" style="max-height:300px; overflow:auto;"></pre>
+<p id="messages" style="max-height:300px; overflow:auto;"></p>
 <form method="post" id="message-form">
   <input type="text" placeholder="Type your message" id="message-input" name="message" autofocus required>
   <input type="submit" value="OK">
@@ -9,9 +9,13 @@
     <input type="submit" value="Text-To-Speech"></input>
 </form>
 -->
-<input type="text" id="recognizer" x-webkit-speech size="1" onwebkitspeechchange="checkanswer()"" />
-<a href="#" class="redButton" id="push">Push!</a>
- 
+<input type="text" id="recognizer" class="redButton" x-webkit-speech maxlength=200 size=0 onwebkitspeechchange="checkanswer()" />
+<audio id="coin">
+  <source src="/coin.ogg" type="audio/ogg" />
+  <source src="/coin.mp3" type="audio/mpeg" />
+  Your browser does not support the audio element.
+</audio>  
+
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 
@@ -22,31 +26,23 @@ Number.prototype.pad = function (len) {
 }
 
 /** Socket */
-var sio = io.connect(), socket = sio.socket.of('/chat');
+var sio = io.connect(), socket = sio.socket.of('/quiz');
 socket
 .on('connect', function () {
     // at connection, first send my username
     socket.emit('user', <%- JSON.stringify(username) %>);
 })
-.on('join', function (username, time) {
-    // someone joined room
-    addMessage(username, 'joined room', time);
-})
-.on('bye', function (username, time) {
-    // someone left room
-    addMessage(username, 'left room', time);
-})
 .on('error', function (error) {
     // an error occured
     alert('Error: ' + error);
 })
+.on('log', function (message, time) {
+    // display log message
+    addLogMessage(message, time);
+})
 .on('message', function (username, message, time) {
     // someone wrote a message
     addMessage(username, message, time);
-})
-.on('push', function (username, time) {
-    // someone pushed the button 
-    addMessage(username, 'pushed the button', time);
 })
 .on('release', function () {
     // release the button 
@@ -67,13 +63,14 @@ $('#recognizer').click(function() {
         pushed = true;
         return true;
     }
-    return false;
+    return true;
 });
 
-//$('#push').click(function() {
-//    $('#recognizer').trigger('click');
-//    return false;
-//});
+$('#recognizer').mousedown(function() {
+    document.getElementById('coin').play();
+    //$('#recognizer').trigger('click');
+    return true;
+});
  
 function checkanswer() {
     var answer = $('#recognizer').val();
@@ -81,15 +78,51 @@ function checkanswer() {
     $('#recognizer').val('');
 };
 
+//var elem = document.getElementById('recognizer');
+//var support = 'onwebkitspeechchange' in elem;
+//alert(support);
+
 /** Display */
 var messagesArea = $('#messages');
 function addMessage(username, message, time) {
-  if (typeof time != 'string') {
-    var date = new Date(time);
-    time = date.getHours().pad(2) + ':' + date.getMinutes().pad(2) + ':' + date.getSeconds().pad(2);
-  }
-  var line = '[' + time + '] <strong>' + username + '</strong>: ' + message + '<br />';
-  messagesArea.html(messagesArea.html() + line);
-  messagesArea.animate({scrollTop: messagesArea[0].scrollHeight});
+    if (typeof time != 'string') {
+        var date = new Date(time);
+        time = date.getHours().pad(2) + ':' + date.getMinutes().pad(2) + ':' + date.getSeconds().pad(2);
+    }
+    //var line = '[' + time + '] <strong>' + username + '</strong>: ' + message + '<br />';
+    var line = '<strong>&lt;' + username + '&gt;</strong> ' + message + '<br />';
+    messagesArea.html(messagesArea.html() + line);
+    messagesArea.animate({scrollTop: messagesArea[0].scrollHeight});
 }
+
+function addRecoMessage(username, message, time) {
+    if (typeof time != 'string') {
+        var date = new Date(time);
+        time = date.getHours().pad(2) + ':' + date.getMinutes().pad(2) + ':' + date.getSeconds().pad(2);
+    }
+    //var line = '[' + time + '] <strong>' + username + '</strong>: ' + message + '<br />';
+    var line = '<span class=reco><strong>&lt;' + username + '&gt;</strong> ' + message + '</span><br />';
+    messagesArea.html(messagesArea.html() + line);
+    messagesArea.animate({scrollTop: messagesArea[0].scrollHeight});
+}
+
+function addLogMessage(message, time) {
+    if (typeof time != 'string') {
+        var date = new Date(time);
+        time = date.getHours().pad(2) + ':' + date.getMinutes().pad(2) + ':' + date.getSeconds().pad(2);
+    }
+    var tokens = message.split('<br />');
+    //var line = '[' + time + '] <strong>*</strong> ' + tokens[0] + '<br />';
+    var line = '<span class=log><strong>*</strong> ' + tokens[0] + '</span><br />';
+    for (var i=1; i<tokens.length; i++) {
+      line += '&nbsp;&nbsp;' + tokens[i] + '<br />';
+    }
+    messagesArea.html(messagesArea.html() + line);
+    messagesArea.animate({scrollTop: messagesArea[0].scrollHeight});
+}
+
+$(window).resize($.debounce(100, function() {
+    messagesArea.animate({scrollTop: messagesArea[0].scrollHeight}, {duration: 0});
+}));
+
 </script>

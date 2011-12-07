@@ -1,9 +1,14 @@
 body {
     padding: 50px;
-    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 14px Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace;
 }
-a {
-    color: #00B7FF;
+
+.log {
+    color: green;
+}
+
+.rec {
+    color: blue;
 }
 
 /*----------------------------
@@ -17,16 +22,18 @@ input.redButton{
     background-color:red;
     text-transform: uppercase;
     position:relative;
-    padding:15px;
+    padding: 5px 15px 5px 5px;
     line-height:50px;
     text-align:center;
     text-decoration: none !important;
     font-weight:bold;
-    color:#fff;
-    font-size:14px;
+    color:red;
+    font-size:80px;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
     bottom:0;
-    margin:0;
+    margin-top:5px;
+    border: 0px solid;
+    outline: none;
 
     transition:0.15s linear;
     -moz-transition:0.15s linear;
@@ -47,48 +54,4 @@ input.redButton:active{
     box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
     -moz-box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
     -webkit-box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
-}
-
-a.redButton{
-    display: inline-block;
-    width:50px;
-    height: 50px;
-    background-color:red;
-    text-transform: uppercase;
-    position:relative;
-    padding:15px;
-    line-height:50px;
-    text-align:center;
-    text-decoration: none !important;
-    font-weight:bold;
-    color:#fff;
-    font-size:14px;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-    bottom:0;
-    margin:0;
-
-    transition:0.15s linear;
-    -moz-transition:0.15s linear;
-    -webkit-transition:0.15s linear;
-
-    box-shadow:0 5px 0 darkred,0 0 10px rgba(0,0,0,0.3) inset, 8px 10px 4px rgba(0,0,0,0.4);
-    -moz-box-shadow:0 5px 0 darkred,0 0 10px rgba(0,0,0,0.3) inset, 8px 10px 4px rgba(0,0,0,0.4);
-    -webkit-box-shadow:0 5px 0 darkred,0 0 10px rgba(0,0,0,0.3) inset, 8px 10px 4px rgba(0,0,0,0.4);
-
-    border-radius:50%;
-    -moz-border-radius:50%;
-    -webkit-border-radius:50%;
-}
-
-a.redButton:active{
-    bottom:-5px;
-
-    box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
-    -moz-box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
-    -webkit-box-shadow:0 0 0 darkred,0 0 20px rgba(0,0,0,0.5) inset;
-}
-
-#buttonContainer{
-    padding:140px;
-    text-align: center;
 }
