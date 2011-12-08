@@ -268,7 +268,14 @@ sockets.on('connection', function (socket) { // New client
         }
     });
 
-    function displayScores() {
+    function nextQuestion() {
+        sockets.emit('log', "too late! the correct answer was '"+answer+"'", Date.now());
+        askQuestion();
+    }
+
+    function endGame() {
+        clearTimeout(timeoutID);
+        started = false;
         redisClient.smembers("users", function (err, users) {
             users.forEach(function(user) {
                 redisClient.hgetall(user, function (err, info) {
@@ -280,17 +287,6 @@ sockets.on('connection', function (socket) { // New client
                 });
             });
         });
-    }
-
-    function nextQuestion() {
-        sockets.emit('log', "too late! the correct answer was '"+answer+"'", Date.now());
-        askQuestion();
-    }
-
-    function endGame() {
-        clearTimeout(timeoutID);
-        started = false;
-        displayScores();
     }
 
     function askQuestion() {
@@ -526,7 +522,17 @@ sockets.on('connection', function (socket) { // New client
                     });
                     break;
                 case 'scores':
-                    displayScores();
+                    redisClient.smembers("users", function (err, users) {
+                        users.forEach(function(user) {
+                            redisClient.hgetall(user, function (err, info) {
+                                if (info['points'] > 1) {
+                                   socket.emit('log', info['username']+' has '+info['points']+' points', Date.now());
+                                } else {
+                                    socket.emit('log', info['username']+' has '+info['points']+' point', Date.now());
+                                }
+                            });
+                        });
+                    });
                     break;
                 default:
                     socket.emit('log', 'unknown command', Date.now());
